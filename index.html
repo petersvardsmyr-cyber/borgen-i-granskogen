@@ -3130,6 +3130,15 @@ try{const m=location.hash.match(/^#vandrare=([A-Za-z0-9_-]+)$/);
       const i=store.chars.findIndex(x=>x.id===cc.id);if(i<0){store.chars.push(cc);n++;}else if((cc.updated||0)>(store.chars[i].updated||0)){store.chars[i]=cc;n++;}}
     lsSave();history.replaceState(null,'',location.pathname+location.search);
     setTimeout(()=>toast(n?`${n} vandrare har flyttats hit. De sparas nu i den här webbläsaren.`:'Vandrarna fanns redan här.'),1200);}}catch(e){}
+// short moving link: #flytt=<code> fetches flytt/<code>.json and adds those walkers the same way
+function importChars(inc){let n=0;for(const c of (inc||[]).filter(c=>c&&typeof c.id==='string'&&typeof c.name==='string')){const cc={id:c.id,name:String(c.name).slice(0,28),created:+c.created||Date.now(),updated:+c.updated||Date.now(),data:c.data&&typeof c.data==='object'?c.data:null};
+  const i=store.chars.findIndex(x=>x.id===cc.id);if(i<0){store.chars.push(cc);n++;}else if((cc.updated||0)>(store.chars[i].updated||0)){store.chars[i]=cc;n++;}}
+  lsSave();return n;}
+{const m=location.hash.match(/^#flytt=([A-Za-z0-9]{6,40})$/);
+  if(m){history.replaceState(null,'',location.pathname+location.search);
+    fetch('flytt/'+m[1]+'.json',{cache:'no-store'}).then(r=>{if(!r.ok)throw 0;return r.json();}).then(d=>{const n=importChars(d.chars);if(current==null&&typeof renderMenu==='function')renderMenu();
+      if(store.mode==='db')for(const c of store.chars)queueWrite(c);
+      toast(n?`${n} vandrare har flyttats hit. De sparas nu i den här webbläsaren.`:'Vandrarna fanns redan här.');}).catch(()=>toast('Flyttlänken fungerade inte.'));}}
 function queueWrite(c){if(store.mode!=='db'||!store.col)return;store.pending[c.id]=JSON.parse(JSON.stringify(c));if(!store.inflight[c.id])flushWrite(c.id);}
 async function flushWrite(id){const data=store.pending[id];if(!data)return;delete store.pending[id];store.inflight[id]=true;
   try{await store.col.doc(id).set(data);}catch(e){const c=String((e&&(e.code||e.message))||'');if(/permission|denied|grant|writer|forbidden/i.test(c)){store.mode='local';renderMenu();}}
