@@ -3144,7 +3144,7 @@ async function flushWrite(id){const data=store.pending[id];if(!data)return;delet
   try{await store.col.doc(id).set(data);}catch(e){const c=String((e&&(e.code||e.message))||'');if(/permission|denied|grant|writer|forbidden/i.test(c)){store.mode='local';renderMenu();}}
   store.inflight[id]=false;if(store.pending[id])flushWrite(id);}
 // ---------- optional Google login (outside Claude): the same doc/get interface, backed by a Supabase table with row-level security
-const SUPA={url:'',key:''};
+const SUPA={url:'https://itlviftejghndhtvookl.supabase.co',key:'sb_publishable_Gt4nLhiANHO0dwT8OzvD1Q_cw_U9mz5'};
 let sb=null,sbUser=null;
 function supaCol(uid){const t=()=>sb.from('characters');return {
   get:async()=>{const {data,error}=await t().select('id,name,data,created,updated');if(error)throw error;return {docs:(data||[]).map(r=>({data:()=>r}))};},
