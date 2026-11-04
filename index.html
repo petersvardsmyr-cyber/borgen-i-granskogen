@@ -52,6 +52,17 @@ button{font-family:inherit;}
 #xpFloat.go{animation:xpf 1.6s ease-out;}
 @keyframes xpf{0%{opacity:0;transform:translateY(4px)}15%{opacity:1;transform:none}75%{opacity:1}100%{opacity:0;transform:translateY(-6px)}}
 #hearts{display:flex;flex-wrap:wrap;gap:2px;}
+/* left panels fold into one small row (rank + hearts) to free the screen on phones */
+#whoToggle{pointer-events:auto;flex:none;width:30px;height:30px;margin:-6px -6px -6px -2px;border:0;border-radius:50%;background:none;cursor:pointer;display:grid;place-items:center;padding:0;}
+#whoToggle::after{content:'';width:8px;height:8px;border-right:2px solid var(--ember);border-bottom:2px solid var(--ember);transform:translateY(2px) rotate(-135deg);transition:transform .2s;}
+#hudL.compact #whoToggle::after{transform:translateY(-2px) rotate(45deg);}
+#whoToggle:focus-visible{outline:2px solid var(--ember);outline-offset:-2px;}
+#hudL.compact{width:auto;}
+#hudL.compact .who{grid-auto-flow:column;align-items:center;gap:8px;padding:5px 8px;justify-self:start;}
+#hudL.compact .whoTop{order:2;}
+#hudL.compact #whoName,#hudL.compact .xpbar,#hudL.compact .xpRow,#hudL.compact #questBox{display:none;}
+#hudL.compact #hearts{flex-wrap:nowrap;}
+#hudL.compact .heart{width:15px;height:15px;}
 .heart{width:18px;height:18px;}
 .heart.on{fill:var(--blood);filter:drop-shadow(0 1px 2px rgba(0,0,0,.6));}
 .heart.off{fill:rgba(241,228,198,.18);}
@@ -218,7 +229,7 @@ button.slot:focus-visible{outline:2px solid var(--ember);outline-offset:2px;}
 
 <div id="hudL" hidden>
   <div class="who">
-    <div class="whoTop"><span id="whoName"></span><span id="whoRank" class="rank"></span></div>
+    <div class="whoTop"><span id="whoName"></span><span id="whoRank" class="rank"></span><button id="whoToggle" type="button" aria-expanded="true" aria-label="Fäll in panelen" title="Fäll in panelen"></button></div>
     <div class="xpbar" aria-hidden="true"><div id="xpFill"></div></div>
     <div class="xpRow"><span id="xpText"></span><span id="xpFloat"></span></div>
     <div id="hearts" role="img" aria-label="Hälsa"></div>
@@ -2355,6 +2366,10 @@ function updateHUD(){
   const nf=Object.keys(prog.facts).length;$('bookBtn').innerHTML=`${ico('book')}<span>${nf}/${Object.keys(FACTS).length}</span>`;$('bookBtn').setAttribute('aria-label',`Kunskapsboken, ${nf} av ${Object.keys(FACTS).length}`);
   saveSoon=1.2;
 }
+{const hl=$('hudL'),tg=$('whoToggle');let cmp=null;try{cmp=localStorage.getItem('borgen-hud-kompakt');}catch(e){}
+  const setC=on=>{hl.classList.toggle('compact',on);tg.setAttribute('aria-expanded',String(!on));const t=on?'Fäll ut panelen':'Fäll in panelen';tg.setAttribute('aria-label',t);tg.title=t;};
+  setC(cmp===null?matchMedia('(max-height:520px)').matches:cmp==='1');
+  tg.addEventListener('click',()=>{const on=!hl.classList.contains('compact');setC(on);try{localStorage.setItem('borgen-hud-kompakt',on?'1':'0');}catch(e){}});}
 $('questHead').addEventListener('click',()=>{questsOpen=!questsOpen;$('questHead').setAttribute('aria-expanded',String(questsOpen));updateHUD();});
 $('bookBtn').addEventListener('click',()=>{
   const ids=Object.keys(FACTS).filter(k=>prog.facts[k]);
