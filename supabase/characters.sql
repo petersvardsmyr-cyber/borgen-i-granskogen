@@ -12,6 +12,10 @@ create table if not exists public.characters (
 
 alter table public.characters enable row level security;
 
+-- bara inloggade spelare får röra tabellen (och bara sina egna rader, se reglerna nedan)
+revoke all on public.characters from anon;
+grant select, insert, update, delete on public.characters to authenticated;
+
 create policy "Läsa egna vandrare" on public.characters
   for select to authenticated using ((select auth.uid()) = user_id);
 create policy "Skapa egna vandrare" on public.characters
