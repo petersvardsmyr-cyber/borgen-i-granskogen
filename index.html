@@ -3107,6 +3107,14 @@ try{const old=JSON.parse(localStorage.getItem('borgen-i-granskogen-v1')||'null')
   if(old&&!store.chars.length){const e=old.econ||{};store.chars.push({id:'c'+Date.now().toString(36),name:'Vandraren',created:Date.now(),updated:Date.now(),
     data:{xp:0,money:e.money|0,items:{lantern:!!e.lantern,boots:!!e.boots},met:e.met||{},chores:e.chores||{},quest:old.quest|0,bag:old.bag||{},pot:old.pot||{}}});lsSave();}
   localStorage.removeItem('borgen-i-granskogen-v1');}catch(e){}
+// moving walkers between places: a link ending in #vandrare=<base64url JSON> adds them to this browser (newer saves win), then the link is cleaned
+try{const m=location.hash.match(/^#vandrare=([A-Za-z0-9_-]+)$/);
+  if(m){let b=m[1].replace(/-/g,'+').replace(/_/g,'/');while(b.length%4)b+='=';
+    const js=new TextDecoder().decode(Uint8Array.from(atob(b),ch=>ch.charCodeAt(0)));const inc=(JSON.parse(js).chars||[]).filter(c=>c&&typeof c.id==='string'&&typeof c.name==='string');
+    let n=0;for(const c of inc){const cc={id:c.id,name:String(c.name).slice(0,28),created:+c.created||Date.now(),updated:+c.updated||Date.now(),data:c.data&&typeof c.data==='object'?c.data:null};
+      const i=store.chars.findIndex(x=>x.id===cc.id);if(i<0){store.chars.push(cc);n++;}else if((cc.updated||0)>(store.chars[i].updated||0)){store.chars[i]=cc;n++;}}
+    lsSave();history.replaceState(null,'',location.pathname+location.search);
+    setTimeout(()=>toast(n?`${n} vandrare har flyttats hit. De sparas nu i den här webbläsaren.`:'Vandrarna fanns redan här.'),1200);}}catch(e){}
 function queueWrite(c){if(store.mode!=='db'||!store.col)return;store.pending[c.id]=JSON.parse(JSON.stringify(c));if(!store.inflight[c.id])flushWrite(c.id);}
 async function flushWrite(id){const data=store.pending[id];if(!data)return;delete store.pending[id];store.inflight[id]=true;
   try{await store.col.doc(id).set(data);}catch(e){const c=String((e&&(e.code||e.message))||'');if(/permission|denied|grant|writer|forbidden/i.test(c)){store.mode='local';renderMenu();}}
