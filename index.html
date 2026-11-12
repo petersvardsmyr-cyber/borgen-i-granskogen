@@ -33,6 +33,10 @@ button{font-family:inherit;}
 .corner{position:fixed;top:calc(env(safe-area-inset-top,0px) + 12px);width:40px;height:40px;border-radius:50%;background:var(--panel);border:1px solid var(--line);color:var(--ink);font-family:var(--display);font-size:20px;cursor:pointer;display:grid;place-items:center;padding:0;}
 #help{right:calc(env(safe-area-inset-right,0px) + 12px);}
 #mute{right:calc(env(safe-area-inset-right,0px) + 60px);}
+#questBtn{right:calc(env(safe-area-inset-right,0px) + 108px);border-color:var(--ember);}
+#questBtn svg{width:24px;height:24px;display:block;}
+#questBtn span{position:absolute;right:-5px;bottom:-7px;font-family:var(--body);font-size:11.5px;line-height:1;padding:2px 5px;border-radius:999px;background:var(--ember);color:#1b1209;font-weight:700;}
+@media (max-height:520px){body.dlgOpen #fact{opacity:0!important;pointer-events:none!important;}}
 #mute[aria-expanded="true"]{background:var(--ember);color:#1b1209;}
 #vol{position:fixed;top:calc(env(safe-area-inset-top,0px) + 60px);right:calc(env(safe-area-inset-right,0px) + 12px);width:210px;background:rgba(14,12,10,.94);border:1px solid var(--line);border-radius:8px;padding:10px 14px 12px;display:grid;gap:8px;z-index:5;box-shadow:0 10px 30px rgba(0,0,0,.6);}
 #vol label{display:grid;gap:2px;font-family:var(--display);font-size:14px;letter-spacing:.03em;color:var(--ink);}
@@ -295,7 +299,6 @@ button.slot:focus-visible{outline:2px solid var(--ember);outline-offset:2px;}
   <div id="potions" class="slots"></div>
   <div id="bagGrid" class="slots"></div>
   <div id="tools" class="slots"></div>
-  <button id="questBtn" class="slot wide" type="button" title="Uppdrag (J)"></button>
   <button id="bookBtn" class="slot wide" type="button"></button>
 </div>
 <aside id="fact" hidden><div class="factBody"><p class="factEye">Visste du?</p><p id="factTitle"></p><p id="factText"></p><button id="factClose" type="button" aria-label="Stäng">×</button></div><button id="factTab" type="button" aria-expanded="true" aria-controls="fact"><span id="factTabTxt">Visste du?</span></button></aside>
@@ -307,6 +310,7 @@ button.slot:focus-visible{outline:2px solid var(--ember);outline-offset:2px;}
   <label for="volMusic"><span>Musik <output id="volMusicOut">60</output></span><input id="volMusic" type="range" min="0" max="100" step="1" value="60"></label>
   <label for="volAmb"><span>Miljöljud <output id="volAmbOut">60</output></span><input id="volAmb" type="range" min="0" max="100" step="1" value="60"></label>
 </div>
+<button id="questBtn" class="corner" type="button" title="Uppdrag (J)" hidden></button>
 <button id="help" class="corner" type="button" aria-label="Meny och vandrare" title="Meny och vandrare" hidden>☰</button>
 <div id="dlg" hidden><p class="who" id="dlgWho">Hjalmar, kocken</p><p id="dlgText"></p><div id="dlgBtns"></div></div>
 <div id="hurt"></div>
@@ -388,7 +392,7 @@ button.slot:focus-visible{outline:2px solid var(--ember);outline-offset:2px;}
 'use strict';
 const isTouch = matchMedia('(pointer:coarse)').matches;
 document.getElementById('controls').innerHTML = isTouch
-  ? '<dt>Gå</dt><dd>Vänster tumme på skärmens vänstra del</dd><dt>Titta</dt><dd>Dra med höger tumme</dd><dt>Göra</dt><dd>Tryck på knappen som dyker upp, eller tryck snabbt var som helst i bilden, till exempel för att prata, sova eller tända ljus</dd><dt>Drycker</dt><dd>Tryck på dryckerna uppe till vänster</dd><dt>Uppdrag</dt><dd>Tryck på pergamentrullen till höger för att se uppdragen och få ledtrådar</dd><dt>Karta</dt><dd>Tryck på kartan nere till höger för att se den stort</dd><dt>Kikaren</dt><dd>Dra för att titta, knapparna zoomar</dd>'
+  ? '<dt>Gå</dt><dd>Vänster tumme på skärmens vänstra del</dd><dt>Spring</dt><dd>Dra tummen långt ut från där du började</dd><dt>Titta</dt><dd>Dra med höger tumme</dd><dt>Göra</dt><dd>Tryck på knappen som dyker upp, eller tryck snabbt var som helst i bilden, till exempel för att prata, sova eller tända ljus</dd><dt>Drycker</dt><dd>Tryck på dryckerna uppe till vänster</dd><dt>Uppdrag</dt><dd>Tryck på pergamentrullen uppe till höger för att se uppdragen och få ledtrådar</dd><dt>Karta</dt><dd>Tryck på kartan nere till höger för att se den stort</dd><dt>Kikaren</dt><dd>Dra för att titta, knapparna zoomar</dd>'
   : '<dt>Gå</dt><dd>W och S framåt och bakåt, A och D åt sidan</dd><dt>Vrid</dt><dd>Pil vänster och höger, eller musen</dd><dt>Spring</dt><dd>Håll in Shift</dd><dt>Titta</dt><dd>Klicka i spelet en gång, sedan styr musen eller styrplattan blicken. Esc släpper musen så du kan klicka på knapparna i hörnen</dd><dt>Göra saker med musen</dt><dd>Klicka när en handling visas, till exempel för att prata eller tända ljus. Efter samtal tar spelet tillbaka musen av sig självt</dd><dt>Göra</dt><dd>E för att prata, sova, spela eller tända ljus</dd><dt>Drycker</dt><dd>1 för helande, 2 för snabbhet</dd><dt>Uppdrag</dt><dd>J öppnar uppdragen, där du också kan få ledtrådar</dd><dt>Karta</dt><dd>M öppnar den stora kartan</dd><dt>Kikaren</dt><dd>Musen, styrplattan eller piltangenterna för att titta, scrollhjulet zoomar</dd><dt>Spela</dt><dd>1 till 5 spelar tonerna hos spelmannen</dd>';
 
 // ---------- basics
@@ -2786,13 +2790,13 @@ function faint(){fadeTo('Det svartnar och du segnar ner i mossan …','… och v
 // ---------- dialogue
 let talkingTo=null;
 function openDlg(text,buttons,who){
-  dlg.hidden=false;dialogOpen=true;act.hidden=true;actMode=null;
+  dlg.hidden=false;dialogOpen=true;act.hidden=true;actMode=null;document.body.classList.add('dlgOpen');
   $('dlgWho').textContent=who||'Hjalmar, kocken';
   const box0=$('dlgText');box0.classList.remove('book');box0.textContent=text;const box=$('dlgBtns');box.innerHTML='';
   buttons.forEach(([label,fn,dis])=>{const b=document.createElement('button');b.type='button';b.textContent=label;b.disabled=!!dis;b.addEventListener('click',fn);box.appendChild(b);});
   const f=box.querySelector('button:not(:disabled)');if(f&&!isTouch)f.focus();
 }
-function closeDlg(){melody=null;if(!dialogOpen)return;dlg.hidden=true;dialogOpen=false;talkingTo=null;if(cook.state==='talk')cook.state='walk';}
+function closeDlg(){melody=null;if(!dialogOpen)return;dlg.hidden=true;dialogOpen=false;document.body.classList.remove('dlgOpen');talkingTo=null;if(cook.state==='talk')cook.state='walk';}
 function startBrew(kind,next,after){
   for(const [h,n] of Object.entries(RECIPES[kind].need))bag[h]-=n;
   brewing={kind,next};closeDlg();updateHUD();
@@ -3652,7 +3656,7 @@ function startCharacter(c){
   const same=current&&current.id===c.id;
   if(!same)applyCharacter(c);
   if(Object.isFrozen(c)||(c.data&&Object.isFrozen(c.data))){const cc=JSON.parse(JSON.stringify(c));const i=store.chars.indexOf(c);if(i>=0)store.chars[i]=cc;c=cc;}
-  current=c;intro.hidden=true;helpBtn.hidden=false;muteBtn.hidden=false;$('hudL').hidden=false;$('hudR').hidden=false;
+  current=c;intro.hidden=true;helpBtn.hidden=false;muteBtn.hidden=false;$('questBtn').hidden=false;$('hudL').hidden=false;$('hudR').hidden=false;
   started=true;initAudio();updateHUD();showMini();if(!same)setTimeout(()=>{if(!story().intro)showIntroStory();else toast(`Välkommen tillbaka, ${c.name}!`);},500);
   lastArea='';
 }
@@ -3758,7 +3762,7 @@ addEventListener('keydown',e=>{
 });
 addEventListener('keyup',e=>{keys[e.code]=false;});
 addEventListener('blur',()=>{for(const k in keys)keys[k]=false;});
-helpBtn.addEventListener('click',()=>{saveNow();closeDlg();scopeExit();closeBigMap();$('mini').hidden=true;$('mapBtn').hidden=true;$('astro').hidden=true;editing=null;confirmDel=null;started=false;renderMenu();intro.hidden=false;helpBtn.hidden=true;muteBtn.hidden=true;$('vol').hidden=true;muteBtn.setAttribute('aria-expanded','false');act.hidden=true;actMode=null;});
+helpBtn.addEventListener('click',()=>{saveNow();closeDlg();scopeExit();closeBigMap();$('mini').hidden=true;$('mapBtn').hidden=true;$('astro').hidden=true;editing=null;confirmDel=null;started=false;renderMenu();intro.hidden=false;helpBtn.hidden=true;$('questBtn').hidden=true;closeJournal();muteBtn.hidden=true;$('vol').hidden=true;muteBtn.setAttribute('aria-expanded','false');act.hidden=true;actMode=null;});
 muteBtn.addEventListener('click',()=>{const v=$('vol');v.hidden=!v.hidden;muteBtn.setAttribute('aria-expanded',String(!v.hidden));});
 function setVolume(){
   const m=+$('volMusic').value,a=+$('volAmb').value;$('volMusicOut').textContent=m;$('volAmbOut').textContent=a;
@@ -3896,7 +3900,7 @@ function update(dt){
     player.yaw+=((keys.ArrowLeft||keys.KeyQ?1:0)-(keys.ArrowRight?1:0))*2.2*dt;
   }
   const m=Math.hypot(f,s);if(m>1){f/=m;s/=m;}
-  const sp=((keys.ShiftLeft||keys.ShiftRight)?6:3.4)*(player.speedT>0?1.8:1)*(prog.items.boots?1.2:1);
+  const sp=((keys.ShiftLeft||keys.ShiftRight||Math.hypot(joy.x,joy.y)>0.9)?6:3.4)*(player.speedT>0?1.8:1)*(prog.items.boots?1.2:1);
   const sy=Math.sin(player.yaw),cy=Math.cos(player.yaw);
   const moved=moveBy((-sy*f+cy*s)*sp*dt,(-cy*f-sy*s)*sp*dt);
   unstick(dt,Math.hypot(f,s),moved,sp,-sy*f+cy*s,-cy*f-sy*s);
