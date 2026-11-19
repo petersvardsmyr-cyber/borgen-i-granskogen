@@ -1,5 +1,12 @@
 <!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
 <title>Borgen i granskogen</title>
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#0a0e18">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<link rel="icon" href="ikon-192.png">
+<link rel="apple-touch-icon" href="ikon-192.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400;0,500;1,400&family=IM+Fell+English+SC&display=swap">
@@ -41,6 +48,8 @@ button{font-family:inherit;}
 #vol{position:fixed;top:calc(env(safe-area-inset-top,0px) + 60px);right:calc(env(safe-area-inset-right,0px) + 12px);width:210px;background:rgba(14,12,10,.94);border:1px solid var(--line);border-radius:8px;padding:10px 14px 12px;display:grid;gap:8px;z-index:5;box-shadow:0 10px 30px rgba(0,0,0,.6);}
 #vol label{display:grid;gap:2px;font-family:var(--display);font-size:14px;letter-spacing:.03em;color:var(--ink);}
 #vol label span{display:flex;justify-content:space-between;}
+#vol .fsBtn{margin-top:4px;justify-self:start;}
+#fsMenu{justify-self:start;}
 #vol label output{font-family:var(--body);color:var(--ink-dim);font-variant-numeric:tabular-nums;}
 #vol input[type=range]{width:100%;accent-color:var(--ember);margin:0;height:24px;}
 #hudL{position:fixed;top:calc(env(safe-area-inset-top,0px) + 12px);left:calc(env(safe-area-inset-left,0px) + 12px);width:min(calc(100vw - 196px),300px);display:grid;gap:6px;align-content:start;pointer-events:none;}
@@ -309,6 +318,7 @@ button.slot:focus-visible{outline:2px solid var(--ember);outline-offset:2px;}
 <div id="vol" hidden>
   <label for="volMusic"><span>Musik <output id="volMusicOut">60</output></span><input id="volMusic" type="range" min="0" max="100" step="1" value="60"></label>
   <label for="volAmb"><span>Miljöljud <output id="volAmbOut">60</output></span><input id="volAmb" type="range" min="0" max="100" step="1" value="60"></label>
+  <button id="fsGame" class="ghost small fsBtn" type="button" hidden>Helskärm</button>
 </div>
 <button id="questBtn" class="corner" type="button" title="Uppdrag (J)" hidden></button>
 <button id="help" class="corner" type="button" aria-label="Meny och vandrare" title="Meny och vandrare" hidden>☰</button>
@@ -373,6 +383,7 @@ button.slot:focus-visible{outline:2px solid var(--ember);outline-offset:2px;}
     <h1>Borgen i granskogen</h1>
     <p>Snart är det höstgille på borgen, men ingenting är färdigt. Hjälp borgens folk, ett uppdrag i taget, tills festen kan börja. Längs vägen samlar du örter i skogen, upptäcker tjärnen och den gamla ruinen och lär dig om livet på medeltiden.</p>
     <button id="resume" class="primary" type="button" hidden>Fortsätt spela</button>
+    <button id="fsMenu" class="ghost small fsBtn" type="button" hidden>Spela i helskärm</button>
     <section id="charSec" hidden><h2>Dina vandrare</h2><ul id="charList"></ul></section>
     <form id="newForm">
       <h2 id="newTitle">Skapa din vandrare</h2>
@@ -392,7 +403,7 @@ button.slot:focus-visible{outline:2px solid var(--ember);outline-offset:2px;}
 'use strict';
 const isTouch = matchMedia('(pointer:coarse)').matches;
 document.getElementById('controls').innerHTML = isTouch
-  ? '<dt>Gå</dt><dd>Vänster tumme på skärmens vänstra del</dd><dt>Spring</dt><dd>Dra tummen långt ut från där du började</dd><dt>Titta</dt><dd>Dra med höger tumme</dd><dt>Göra</dt><dd>Tryck på knappen som dyker upp, eller tryck snabbt var som helst i bilden, till exempel för att prata, sova eller tända ljus</dd><dt>Drycker</dt><dd>Tryck på dryckerna uppe till vänster</dd><dt>Uppdrag</dt><dd>Tryck på pergamentrullen uppe till höger för att se uppdragen och få ledtrådar</dd><dt>Karta</dt><dd>Tryck på kartan nere till höger för att se den stort</dd><dt>Kikaren</dt><dd>Dra för att titta, knapparna zoomar</dd>'
+  ? '<dt>Gå</dt><dd>Vänster tumme på skärmens vänstra del</dd><dt>Spring</dt><dd>Dra tummen långt ut från där du började</dd><dt>Helskärm</dt><dd>Spelet går över till helskärm när du börjar spela. Du kan också slå av och på den under ♪-knappen. På Android kan du välja »Lägg till på startskärmen« i Chrome-menyn, så öppnas spelet alltid i helskärm som en app.</dd><dt>Titta</dt><dd>Dra med höger tumme</dd><dt>Göra</dt><dd>Tryck på knappen som dyker upp, eller tryck snabbt var som helst i bilden, till exempel för att prata, sova eller tända ljus</dd><dt>Drycker</dt><dd>Tryck på dryckerna uppe till vänster</dd><dt>Uppdrag</dt><dd>Tryck på pergamentrullen uppe till höger för att se uppdragen och få ledtrådar</dd><dt>Karta</dt><dd>Tryck på kartan nere till höger för att se den stort</dd><dt>Kikaren</dt><dd>Dra för att titta, knapparna zoomar</dd>'
   : '<dt>Gå</dt><dd>W och S framåt och bakåt, A och D åt sidan</dd><dt>Vrid</dt><dd>Pil vänster och höger, eller musen</dd><dt>Spring</dt><dd>Håll in Shift</dd><dt>Titta</dt><dd>Klicka i spelet en gång, sedan styr musen eller styrplattan blicken. Esc släpper musen så du kan klicka på knapparna i hörnen</dd><dt>Göra saker med musen</dt><dd>Klicka när en handling visas, till exempel för att prata eller tända ljus. Efter samtal tar spelet tillbaka musen av sig självt</dd><dt>Göra</dt><dd>E för att prata, sova, spela eller tända ljus</dd><dt>Drycker</dt><dd>1 för helande, 2 för snabbhet</dd><dt>Uppdrag</dt><dd>J öppnar uppdragen, där du också kan få ledtrådar</dd><dt>Karta</dt><dd>M öppnar den stora kartan</dd><dt>Kikaren</dt><dd>Musen, styrplattan eller piltangenterna för att titta, scrollhjulet zoomar</dd><dt>Spela</dt><dd>1 till 5 spelar tonerna hos spelmannen</dd>';
 
 // ---------- basics
@@ -3652,6 +3663,7 @@ function renderMenu(){
   $('authRow').hidden=!sb;$('loginBtn').hidden=!sb||(cloud&&store.kind==='google');$('logoutBtn').hidden=!(cloud&&store.kind==='google');
 }
 function startCharacter(c){
+  if(isTouch)fsEnter();
   if(current&&current.id!==c.id)saveNow();
   const same=current&&current.id===c.id;
   if(!same)applyCharacter(c);
@@ -4128,7 +4140,17 @@ function frameBody(now){
 renderer.domElement.addEventListener('webglcontextlost',e=>{e.preventDefault();try{saveNow();}catch(_){}
   const f=document.getElementById('fade');if(f){f.textContent='Grafiken tappades (iPaden behövde minne). Tryck här för att ladda om – din vandrare är sparad.';f.classList.add('on');f.style.cursor='pointer';f.onclick=()=>location.reload();}});
 renderer.domElement.addEventListener('webglcontextrestored',()=>location.reload());
-addEventListener('resize',()=>{renderer.setSize(innerWidth,innerHeight);camera.aspect=innerWidth/innerHeight;camera.updateProjectionMatrix();});
+// ---------- fullscreen: a button in the menu and in the sound panel, and on touch screens the game asks for fullscreen when you start playing
+const fsEl=document.documentElement;
+const fsOK=!!(fsEl.requestFullscreen||fsEl.webkitRequestFullscreen)&&(document.fullscreenEnabled||document.webkitFullscreenEnabled);
+const fsOn=()=>!!(document.fullscreenElement||document.webkitFullscreenElement);
+const standalone=()=>matchMedia('(display-mode: fullscreen)').matches||matchMedia('(display-mode: standalone)').matches;
+function fsEnter(){if(!fsOK||fsOn()||standalone())return;try{const r=(fsEl.requestFullscreen||fsEl.webkitRequestFullscreen).call(fsEl,{navigationUI:'hide'});if(r&&r.catch)r.catch(()=>{});}catch(_){}}
+function fsExit(){try{const r=(document.exitFullscreen||document.webkitExitFullscreen).call(document);if(r&&r.catch)r.catch(()=>{});}catch(_){}}
+function fsSync(){const on=fsOn();for(const id of ['fsGame','fsMenu']){const b=$(id);b.hidden=!fsOK||standalone();b.textContent=on?'Lämna helskärm':(id==='fsMenu'?'Spela i helskärm':'Helskärm');}}
+for(const id of ['fsGame','fsMenu'])$(id).addEventListener('click',()=>{fsOn()?fsExit():fsEnter();});
+document.addEventListener('fullscreenchange',fsSync);document.addEventListener('webkitfullscreenchange',fsSync);fsSync();
+addEventListener('resize',()=>{fsSync();renderer.setSize(innerWidth,innerHeight);camera.aspect=innerWidth/innerHeight;camera.updateProjectionMatrix();});
 requestAnimationFrame(frame);
 })();
 </script>
