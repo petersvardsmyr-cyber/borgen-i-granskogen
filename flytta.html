@@ -1,0 +1,65 @@
+<!doctype html>
+<html lang="sv">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex">
+<title>Flytta dina vandrare – Borgen i granskogen</title>
+<link rel="icon" href="ikon-192.png">
+<link href="https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400;0,500;1,400&display=swap" rel="stylesheet">
+<style>
+  *{box-sizing:border-box}
+  body{margin:0;min-height:100vh;display:flex;align-items:center;justify-content:center;padding:24px;
+    background:radial-gradient(ellipse at 50% 120%,#3a2a1c 0%,#0a0e18 60%);color:#f3ead6;
+    font:18px/1.55 "EB Garamond",Georgia,serif}
+  main{max-width:520px;width:100%;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.12);border-radius:18px;padding:28px 26px}
+  h1{margin:0 0 8px;font-size:34px;line-height:1.1;font-weight:500}
+  p{margin:0 0 14px;color:#e6dcc4}
+  ol{margin:6px 0 20px;padding-left:22px}
+  li{margin:6px 0}
+  a{color:#ffcf6e}
+  .names{background:rgba(0,0,0,.25);border-radius:12px;padding:10px 14px;margin:0 0 18px;font-style:italic}
+  .btn{display:inline-flex;align-items:center;justify-content:center;min-height:50px;padding:0 22px;border-radius:12px;
+    background:#e8a03c;color:#1b130b;font:inherit;font-weight:500;font-size:19px;text-decoration:none;border:0}
+  .btn[aria-disabled=true]{opacity:.4;pointer-events:none}
+  .small{font-size:15px;color:#bfb49c;margin-top:18px}
+</style>
+</head>
+<body>
+<main>
+  <h1>Flytta dina vandrare</h1>
+  <p>Borgen i granskogen har flyttat till Peters spelsamling. Här kan du ta med dig vandrarna som är sparade i den här webbläsaren.</p>
+  <div class="names" id="names">Letar efter vandrare…</div>
+  <ol>
+    <li><a href="https://www.petersvardsmyr.se/spel" target="_blank" rel="noopener">Öppna spelsamlingen</a> och logga in, om du inte redan har gjort det.</li>
+    <li>Kom tillbaka hit och tryck på knappen.</li>
+  </ol>
+  <a class="btn" id="go" aria-disabled="true">Flytta till spelsamlingen</a>
+  <p class="small">Gör så här på varje enhet och webbläsare där du har spelat. Vandrarna finns kvar här också, så inget försvinner. Har en vandrare redan flyttats behålls den senast sparade versionen.</p>
+</main>
+<script>
+{
+  // Läser vandrarna som Borgen har sparat i den här webbläsaren (samma nyckel som spelet använder)
+  let chars = [];
+  try {
+    const s = JSON.parse(localStorage.getItem('borgen-vandrare-v1') || 'null');
+    if (s && Array.isArray(s.chars)) chars = s.chars.filter(c => c && c.id && c.name);
+  } catch (e) {}
+
+  const names = document.getElementById('names'), go = document.getElementById('go');
+  if (!chars.length) {
+    names.textContent = 'Inga sparade vandrare hittades i den här webbläsaren.';
+  } else {
+    names.textContent = (chars.length === 1 ? '1 vandrare: ' : chars.length + ' vandrare: ') + chars.map(c => c.name).join(', ');
+    // Samma format som spelets inbyggda flyttlänk (#vandrare=<base64url JSON>)
+    const bytes = new TextEncoder().encode(JSON.stringify({ chars }));
+    let bin = '';
+    for (let i = 0; i < bytes.length; i += 0x8000) bin += String.fromCharCode.apply(null, bytes.subarray(i, i + 0x8000));
+    const code = btoa(bin).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
+    go.href = 'https://www.petersvardsmyr.se/spel/borgen#vandrare=' + code;
+    go.setAttribute('aria-disabled', 'false');
+  }
+}
+</script>
+</body>
+</html>
